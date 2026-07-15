@@ -11,6 +11,19 @@
 - El cliente del dashboard debe usar `socket.io-client` (NestJS
   WebSocketGateway usa Socket.IO por defecto, no WebSocket nativo).
 
+## Bot de Telegram (2026-07-14)
+- Formato de `/signal` diseñado por nosotros (no hay canal real con el que
+  contrastar todavía): `SYMBOL=... SIDE=BUY|SELL ENTRY=... SL=... TP=a,b,c`.
+  `/trade SIGNAL_ID=<uuid> STATUS=OPENED|CLOSED|CANCELLED PRICE=...`.
+  Ajustar `bot/src/schemas.py` y `bot/src/handlers/*.py` si el formato real
+  del canal de copytrading resulta distinto — está centralizado ahí.
+- Dependencias: aiogram 3.x, pydantic v2, aiohttp (backend client con
+  retry/backoff), python-dotenv, pytest+pytest-asyncio. 12 tests pasando.
+- `bot/.venv` creado localmente para verificar (gitignored, no se commitea).
+- Bot→Backend vía REST con header `X-Bot-Webhook-Secret`; endpoints
+  esperados en el backend: `POST /bot/signals`, `POST /bot/trades`,
+  `GET /bot/status`. El backend (NestJS) todavía no existe — próximo paso.
+
 ## Estado del repositorio
 - Repo inicializado, remoto `origin` → `github.com/QuanticaSoft/trading`,
   push inicial ya hecho a `main`.
