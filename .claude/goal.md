@@ -91,6 +91,30 @@ sobre PostgreSQL:
 - Nada dispara `/metrics/publish` automáticamente todavía (sin scheduler);
   se llama a mano o desde donde se decida más adelante.
 
+## Terminal Web (implementado)
+Next.js 16 (App Router) + Tailwind v4 + `socket.io-client`, en `terminal/`.
+
+- Carga inicial vía REST: `GET {BACKEND_URL}/signals` y
+  `GET {BACKEND_URL}/metrics/latest` (ambos públicos, sin auth — ver
+  decisión de seguridad abajo).
+- Tiempo real vía WebSocket (`socket.io-client`, no el WebSocket nativo del
+  navegador): suscrito a `signal.created`, `signal.updated`,
+  `metrics.updated`.
+- UI: KPI row (posiciones abiertas, win rate, PnL total, max drawdown,
+  profit factor), gráfico de PnL acumulado (línea, con toggle a vista de
+  tabla para accesibilidad), tabla de señales con badges de estado
+  (punto + texto, nunca solo color).
+- **Decisión de seguridad (v1):** `GET /signals` y `GET /metrics/latest`
+  en el backend NO tienen autenticación — asume que el terminal corre en
+  una red privada (localhost/VPN/Tailscale), no expuesto a internet. El
+  secreto del bot/metrics NUNCA vive en el navegador. Si en algún momento
+  se expone públicamente, hay que agregar auth real a estos dos endpoints
+  antes de eso.
+- Verificado en navegador headless real (Playwright): carga inicial con
+  datos reales, toggle gráfico↔tabla, y actualización en vivo sin recargar
+  la página al crear una señal nueva por WebSocket. Capturas en claro y
+  oscuro revisadas visualmente.
+
 ## Seguridad y cumplimiento (crítico)
 - **Telegram ToS:** no manipular mensajes de otros usuarios sin
   consentimiento. Usar solo `/signal` estructurado.

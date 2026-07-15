@@ -49,6 +49,10 @@ export class SignalsService {
     return this.repo.findOneBy({ id });
   }
 
+  async findRecent(limit: number): Promise<Signal[]> {
+    return this.repo.find({ order: { createdAt: 'DESC' }, take: limit });
+  }
+
   async statusSummary(): Promise<Record<SignalStatus, number>> {
     const counts = await Promise.all(
       ALL_STATUSES.map((status) => this.repo.count({ where: { status } })),

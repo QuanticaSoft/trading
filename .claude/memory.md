@@ -56,6 +56,31 @@
   confirmó la recepción real del evento `metrics.updated` por WebSocket
   con un cliente socket.io de prueba.
 
+## Terminal Web (2026-07-15)
+- Next.js 16 + Tailwind v4, `npx create-next-app` (mismo problema de
+  `npm install` que NestJS — el CLI falla con EALLOWSCRIPTS, hay que
+  correr `npm install` manual después). Estructura: `src/lib` (api.ts,
+  socket.ts, types.ts) + `src/components` (StatTile, StatusBadge,
+  ConnectionBadge, MetricsPanel, SignalsTable, PnlChart).
+- Usé la skill `dataviz` antes de escribir el dashboard: paleta de
+  `references/palette.md` (no inventé colores), status siempre con
+  punto+texto (nunca solo color), gráfico de línea con hover+crosshair y
+  toggle a tabla (accesibilidad), sin dual-axis, sin librería de charts
+  externa (SVG a mano, evita una dependencia más).
+- Backend: agregué `GET /signals` (público) y `GET /metrics/latest`
+  (público, sirve desde un cache en memoria que `POST /internal/metrics`
+  actualiza). Decisión explícita del usuario: sin auth en v1, asumiendo
+  uso en red privada — ver `goal.md`.
+- Corregí un warning real de Next.js: detectaba mal la raíz del
+  workspace por un `yarn.lock` de otro proyecto en `Desktop/WorkSpace`;
+  fijé `turbopack.root` en `next.config.ts`.
+- Verificación real con Playwright headless (Chromium instalado
+  temporalmente vía `npx playwright install`, no quedó como dependencia
+  del proyecto): datos reales cargando, WebSocket conectado, actualización
+  en vivo sin recargar, toggle gráfico/tabla, capturas en claro y oscuro
+  revisadas. Postgres+backend+metrics-service efímeros, todo eliminado
+  después.
+
 ## Estado del repositorio
 - Repo inicializado, remoto `origin` → `github.com/QuanticaSoft/trading`,
   push inicial ya hecho a `main`.
