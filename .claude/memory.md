@@ -38,6 +38,24 @@
 - `bot-webhook.guard.ts` es la única barrera antes de `/bot/*`: si
   `BOT_WEBHOOK_SECRET` no está seteado, rechaza todo (falla cerrado).
 
+## Metrics Service (2026-07-15)
+- FastAPI, lee `signals` directo de Postgres (SQLAlchemy, solo lectura).
+  `compute_summary()` en `src/metrics.py` es pura (recibe un DataFrame),
+  testeada con 12 casos sintéticos sin DB. `ta`/indicadores técnicos
+  quedaron fuera de v1: no hay ingesta de precios OHLC todavía — decisión
+  documentada en `goal.md`, no inventé esa funcionalidad sin datos reales.
+- **Bug encontrado y corregido:** el `.gitignore` raíz tenía `.env.*` sin
+  excepción, lo que silenciosamente excluía TODOS los `.env.example`
+  (incluyendo el del bot, que nunca se había comiteado desde el principio).
+  Agregado `!.env.example` — revisar si se agregan más servicios que
+  cualquier `.env.example` nuevo sí quede trackeado.
+- Verificado end-to-end con Postgres+backend reales (contenedores
+  efímeros, eliminados): sembré 4 señales cerradas (pnl +10,-5,+20,-8),
+  `/metrics/summary` dio los números correctos a mano (drawdown=8,
+  profit_factor=30/13≈2.31), `/metrics/publish` llegó al backend y se
+  confirmó la recepción real del evento `metrics.updated` por WebSocket
+  con un cliente socket.io de prueba.
+
 ## Estado del repositorio
 - Repo inicializado, remoto `origin` → `github.com/QuanticaSoft/trading`,
   push inicial ya hecho a `main`.

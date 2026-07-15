@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { SignalsModule } from './signals/signals.module';
 import { EventsModule } from './events/events.module';
 import { BotModule } from './bot/bot.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BotModule } from './bot/bot.module';
     SignalsModule,
     EventsModule,
     BotModule,
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

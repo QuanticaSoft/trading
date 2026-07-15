@@ -71,6 +71,26 @@ Todos los endpoints bajo `/bot/*` requieren el header `x-bot-webhook-secret`
   `signal_id` devuelve el resumen de conteos por estado.
 - `GET /health` — sin auth, healthcheck simple.
 
+## Metrics Service (implementado)
+Microservicio FastAPI independiente (`metrics-service/`), solo lectura
+sobre PostgreSQL:
+
+- `GET /health` — healthcheck.
+- `GET /metrics/summary` — calcula al vuelo desde `signals` (status=CLOSED,
+  pnl no nulo): `closed_trades`, `win_rate`, `total_pnl`, `average_pnl`,
+  `max_drawdown` (pico a valle sobre el pnl acumulado), `profit_factor`
+  (ganancia bruta / pérdida bruta).
+- `POST /metrics/publish` — calcula y hace `POST` a
+  `{BACKEND_URL}/internal/metrics` con header `X-Metrics-Webhook-Secret`.
+  El backend valida, retransmite por WebSocket (`metrics.updated`) y NO
+  persiste el snapshot (es recalculable en cualquier momento desde
+  `signals`, no hace falta guardarlo).
+- **Limitación conocida:** `ta` (indicadores técnicos) todavía no se usa
+  — requiere una serie de precios OHLC que este proyecto no ingesta hoy.
+  Si se agrega una fuente de velas/precios, ahí se integra `ta`.
+- Nada dispara `/metrics/publish` automáticamente todavía (sin scheduler);
+  se llama a mano o desde donde se decida más adelante.
+
 ## Seguridad y cumplimiento (crítico)
 - **Telegram ToS:** no manipular mensajes de otros usuarios sin
   consentimiento. Usar solo `/signal` estructurado.

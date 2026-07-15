@@ -17,4 +17,8 @@ export class EventsGateway {
   emitSignalUpdated(signal: Signal): void {
     this.server.emit('signal.updated', signal);
   }
+
+  emitMetricsUpdated(snapshot: unknown): void {
+    this.server.emit('metrics.updated', snapshot);
+  }
 }
