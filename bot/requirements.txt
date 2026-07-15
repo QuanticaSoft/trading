@@ -1,0 +1,10 @@
+# Telegram bot framework (async, native rate limiting via @flags.rate_limit)
+aiogram>=3.23,<4.0
+# validation of /signal, /trade payloads before they leave the bot
+pydantic>=2.7,<3.0
+# .env loading in local development
+python-dotenv>=1.0,<2.0
+
+# tests
+pytest>=8.0,<9.0
+pytest-asyncio>=0.24,<0.25
