@@ -57,6 +57,20 @@ Telegram ──> Bot (Python)  ──REST──>  Backend (NestJS)  <──lee/e
 | Terminal UI | Next.js / React |
 | Comunicación Bot → Backend | REST HTTP (webhook interno) |
 
+## Contrato REST Bot → Backend (implementado)
+Todos los endpoints bajo `/bot/*` requieren el header `x-bot-webhook-secret`
+(debe coincidir con `BOT_WEBHOOK_SECRET`), verificado por `BotWebhookGuard`.
+
+- `POST /bot/signals` — body: `signal_id, symbol, side, entry, stop_loss?,
+  take_profit?, source?`. Crea el `Signal` en estado `PENDING` y emite
+  `signal.created` por WebSocket.
+- `POST /bot/trades` — body: `signal_id, status (OPENED|CLOSED|CANCELLED),
+  price?, pnl?`. Actualiza el `Signal` existente y emite `signal.updated`.
+  Responde 404 si `signal_id` no existe.
+- `GET /bot/status?signal_id=<uuid>` — devuelve ese signal, o sin
+  `signal_id` devuelve el resumen de conteos por estado.
+- `GET /health` — sin auth, healthcheck simple.
+
 ## Seguridad y cumplimiento (crítico)
 - **Telegram ToS:** no manipular mensajes de otros usuarios sin
   consentimiento. Usar solo `/signal` estructurado.

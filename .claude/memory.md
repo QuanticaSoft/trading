@@ -24,6 +24,20 @@
   esperados en el backend: `POST /bot/signals`, `POST /bot/trades`,
   `GET /bot/status`. El backend (NestJS) todavía no existe — próximo paso.
 
+## Backend NestJS (2026-07-15)
+- Scaffold vía `@nestjs/cli`, NestJS 11. Módulos: `signals` (entidad
+  `Signal` + `SignalsService`), `events` (`EventsGateway` WebSocket
+  Socket.IO), `bot` (`BotController` con `BotWebhookGuard`).
+- `synchronize: true` en TypeORM solo para dev (`NODE_ENV !== 'production'`)
+  — falta migrar a migraciones reales antes de producción, queda como TODO
+  en `app.module.ts`.
+- Verificado end-to-end con un Postgres real en Docker (efímero, ya
+  eliminado): arranque, guard de auth (401 sin secret), creación de señal,
+  actualización de trade, consulta de status y resumen — los 4 endpoints
+  funcionan correctamente. 8 tests unitarios + typecheck + eslint limpios.
+- `bot-webhook.guard.ts` es la única barrera antes de `/bot/*`: si
+  `BOT_WEBHOOK_SECRET` no está seteado, rechaza todo (falla cerrado).
+
 ## Estado del repositorio
 - Repo inicializado, remoto `origin` → `github.com/QuanticaSoft/trading`,
   push inicial ya hecho a `main`.
